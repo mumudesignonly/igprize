@@ -46,6 +46,7 @@
         <td class="text-xs-left">{{ props.item.value.prizetime }}</td>
         <td class="text-xs-left">{{ props.item.value.manager }}</td>
         <td class="text-xs-left">{{ props.item.value.isCheck }}</td>
+        <td class="text-xs-left">{{ props.item.value.isPost }}</td>
         <td class="text-xs-left">{{ props.item.key }}</td>
         <td class="justify-center layout px-0">
           <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
@@ -139,6 +140,9 @@
                   </v-menu>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
+                  <v-checkbox v-model="editedItem.value.isPost" label="是否已留言" color="#b8f1cc"></v-checkbox>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.value.manager" label="*登記人帳號" :rules="formRules.manager" required :disabled="editState != 'add'" box clearable></v-text-field>
                   <v-checkbox v-model="isRememberManager" label="是否記憶登記人帳號" color="#b8f1cc"></v-checkbox>
                 </v-flex>
@@ -198,6 +202,7 @@
             prizetime: '',
             manager: '',
             isCheck: true,
+            isPost: false,
             createTime: ''
           }
         },
@@ -212,6 +217,7 @@
             prizetime: '',
             manager: '',
             isCheck: true,
+            isPost: false,
             createTime: ''
           }
         },
