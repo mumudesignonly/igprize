@@ -72,7 +72,7 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.value.account" label="*抽獎帳號" :rules="formRules.account" required :disabled="editState != 'add'" box clearable></v-text-field>
+                  <v-text-field v-model="editedItem.value.account" label="抽獎帳號" :rules="formRules.account" :disabled="editState != 'add'" box clearable></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.value.link" label="*抽獎連結" :rules="formRules.link" required box clearable></v-text-field>
@@ -140,11 +140,11 @@
                   </v-menu>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-checkbox v-model="editedItem.value.isPost" label="是否已留言" color="#b8f1cc"></v-checkbox>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedItem.value.manager" label="*登記人帳號" :rules="formRules.manager" required :disabled="editState != 'add'" box clearable></v-text-field>
                   <v-checkbox v-model="isRememberManager" label="是否記憶登記人帳號" color="#b8f1cc"></v-checkbox>
+                </v-flex>
+                <v-flex xs12 sm6 md4 v-if="editState != 'add'">
+                  <v-checkbox v-model="editedItem.value.isPost" label="是否已留言" color="#b8f1cc"></v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -223,12 +223,13 @@
         },
         formRules : { //表單驗證規則
           account : [
-            v => !!v || '請輸入抽獎帳號',
+            // v => !!v || '請輸入抽獎帳號',
             v => (/^[^\u4e00-\u9fa5]*$/).test(v) || '帳號不允許中文'
           ],
           link : [
             v => !!v || '請輸入抽獎連結',
-            v => (v.indexOf('https://www.instagram.com/p/')>-1) || '該連結不是ig連結'
+            v => (v.indexOf('https://www.instagram.com/p/')>-1) || '該連結不是ig連結',
+            v => !v || (this.linkArray.indexOf(v)>-1) || '該連結已存在於列表中'
           ],
           msg: [
             v => !v || ((v.indexOf('@@')>-1) || '標記人的地方請用 @@ 表示')
@@ -240,6 +241,14 @@
             v => !!v || '請輸入您的IG帳號',
           ]
         }
+      }
+    },
+    computed: {
+      linkArray(){
+        let links = this.list.map(item=>{
+          return item.value.link
+        })
+        return links
       }
     },
     watch:{
