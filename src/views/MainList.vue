@@ -229,7 +229,7 @@
           link : [
             v => !!v || '請輸入抽獎連結',
             v => (v.indexOf('https://www.instagram.com/p/')>-1) || '該連結不是ig連結',
-            v => !v || (this.linkArray.indexOf(v)>-1) || '該連結已存在於列表中'
+            v => !v || (this.linkArray.indexOf(v) == -1) || '該連結已存在於列表中'
           ],
           msg: [
             v => !v || ((v.indexOf('@@')>-1) || '標記人的地方請用 @@ 表示')
