@@ -46,10 +46,16 @@
         <td class="text-xs-left">{{ props.item.value.prizetime }}</td>
         <td class="text-xs-left">{{ props.item.value.manager }}</td>
         <td class="text-xs-left">{{ props.item.value.isCheck }}</td>
-        <td class="text-xs-left">{{ props.item.value.isPost }}</td>
+        <td class="text-xs-left">
+          <span v-if="props.item.value.isPost">{{props.item.value.isPost}}</span>
+          <span v-else style="color: #ffaacc;">{{props.item.value.isPost}}</span>
+        </td>
         <td class="text-xs-left">{{ props.item.key }}</td>
-        <td class="justify-center layout px-0">
-          <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+        <td class="text-xs-left">
+          <span style="white-space: nowrap;">
+            <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+            <v-icon small class="mr-2" @click="getItemJson(props.item)">fas fa-share-alt</v-icon>
+          </span>
         </td>
       </template>
     </v-data-table>
@@ -72,10 +78,10 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.value.account" label="抽獎帳號" :rules="formRules.account" :disabled="editState != 'add'" box clearable></v-text-field>
+                  <v-text-field v-model="editedItem.value.account" label="抽獎帳號" :rules="formRules.account" box clearable></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.value.link" label="*抽獎連結" :rules="formRules.link" required box clearable></v-text-field>
+                  <v-text-field v-model="editedItem.value.link" label="*抽獎連結" :rules="(editState == 'add') ? formRules.link : []" required box clearable></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-select
@@ -159,6 +165,7 @@
     <!-- /編輯彈窗 -->
 
     <!-- <v-btn color="#f1b8e4" @click="deleteList">列表內容移除</v-btn> -->
+    <p>{{ this.displayJson }}</p>
   </v-card>
 </template>
 
@@ -183,6 +190,7 @@
           { text: '抽獎日', value: 'prizetime', sortable: true },
           { text: '登記人帳號', value: 'manager', sortable: true },
           { text: '是否上架', value: 'isCheck', sortable: true },
+          { text: '是否已留言', value: 'isPost', sortable: true },
           { text: 'key', value: 'key', sortable: true },
           { text: '操作', value: 'operation', sortable: false }
         ],
@@ -240,7 +248,8 @@
           manager: [
             v => !!v || '請輸入您的IG帳號',
           ]
-        }
+        },
+        displayJson: ''
       }
     },
     computed: {
@@ -253,11 +262,10 @@
     },
     watch:{
       list(datas){ //列表內容變動時
-        datas.forEach((v,i)=>{
+        datas.forEach((v)=>{
           if(v.value.prizetime){
             var now = +new Date()
             var end = +new Date(`${v.value.prizetime} 00:00`)
-            console.log(now,end)
             if(now - end > 0){ //過期
               v.value.isCheck = false
             }else{ //未過期
@@ -306,8 +314,6 @@
           items.sort((a,b)=>{
             var createA = +new Date(a.value.createTime) || 0
             var createB = +new Date(b.value.createTime) || 0
-            console.log(createA)
-            console.log(createB)
             return createB - createA
           })
         }
@@ -352,6 +358,17 @@
       },
       deleteList(){ //刪除所有列表內容
         appControl.firebase_DB.ref('main_list').remove()
+      },
+      getItemJson(item){ //取得項目json格式
+        console.log(item)
+        let jsonObj = {
+          'prizeOwer': [item.value.account],//發起抽獎的人
+          'prizeUrl': item.value.link,
+          'msgLeave': item.value.msg.split('***'),
+          'tagNum': item.value.tagnum
+        }
+        this.displayJson = jsonObj
+        console.log(jsonObj)
       }
     }
   }
