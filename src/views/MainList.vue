@@ -164,8 +164,17 @@
     </v-dialog>
     <!-- /編輯彈窗 -->
 
+    <!-- 額外功能區 -->
     <!-- <v-btn color="#f1b8e4" @click="deleteList">列表內容移除</v-btn> -->
-    <p>{{ this.displayJson }}</p>
+    <p>{{ displayJson }}</p>
+    <v-btn v-if="displayJson" v-clipboard:copy="JSON.stringify(displayJson)" v-clipboard:success="JSONonCopy" v-clipboard:error="JSONonError">複製文字</v-btn>
+    <!-- /額外功能區 -->
+
+    <!-- 提示區 -->
+    <v-snackbar v-model="snackbarInfo.show" :color="snackbarInfo.color" top>
+      {{ snackbarInfo.text }}
+    </v-snackbar>
+    <!-- /提示區 -->
   </v-card>
 </template>
 
@@ -173,6 +182,11 @@
   export default {
     data () {
       return{
+        snackbarInfo: {
+          show: false,
+          text: '',
+          color: 'success',
+        },
         isRememberManager: false, //是否記憶登記人帳號
         search: '', //列表搜尋內容
         list: [], //列表array
@@ -369,6 +383,26 @@
         }
         this.displayJson = jsonObj
         console.log(jsonObj)
+      },
+      JSONonCopy: function (e) {
+        this.snackbarInfo.text = '複製成功溜'
+        this.snackbarInfo.color = 'success'
+        this.snackbarInfo.show = true
+        
+        setTimeout(function(){
+          this.snackbarInfo.text = ''
+          this.snackbarInfo.show = false
+        },5000)
+      },
+      JSONonError: function (e) {
+        console.log(e)
+        this.snackbarInfo.text = '複製失敗欸 怎麼辦呢'
+        this.snackbarInfo.color = 'error'
+        this.snackbarInfo.show = true
+        setTimeout(function(){
+          this.snackbarInfo.text = ''
+          this.snackbarInfo.show = false
+        },5000)
       }
     }
   }
